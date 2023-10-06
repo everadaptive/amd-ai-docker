@@ -28,7 +28,7 @@ services:
       - ./data/lora:/data/lora
       - ./data/cache:/data/cache
       - ./data/prompts:/app/text-generation-webui/prompts
-      - /home/zachd/Storage:/data/model
+      - ${HOME}/Storage:/data/model
 networks:
   proxy: 
     external: 
