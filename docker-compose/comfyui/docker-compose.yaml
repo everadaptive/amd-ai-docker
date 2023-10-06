@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  textgen:
+    image: comfyui-rocm57
+    command: 
+      - --listen=0.0.0.0
+      - --output-directory=/data/output
+      - --temp-directory=/data/temp
+      - --disable-auto-launch
+      - --extra-model-paths-config=/data/extra_model_paths.yaml
+    environment:
+      - HSA_OVERRIDE_GFX_VERSION=11.0.0
+    ports:
+      - 8188
+    networks:
+      - proxy
+    cap_add:
+      - ALL      
+    labels: 
+      - "traefik.http.routers.comfyui.rule=Host(`comfyui.llama`)"
+    devices:
+      - "/dev/kfd:/dev/kfd"
+      - "/dev/dri/:/dev/dri/"
+    group_add:
+      - video   
+      - render
+      - messagebus # Not sure why this group is wrong on /dev in the container
+    volumes:
+      - ./data/:/data/
+      - /home/zachd/Storage/runwayml_stable-diffusion-v1-5:/data/models/Stable-diffusion
+networks:
+  proxy: 
+    external: 
+      name: traefik_default

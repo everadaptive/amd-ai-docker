@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  textgen:
+    image: textgen-rocm57
+    command:
+    - --model-dir=/data/model
+    - --lora-dir=/data/lora
+    - --disk-cache-dir=/data/cache
+    - --settings=/data/settings.yaml
+    - --auto-devices
+    ports:
+      - 7860
+    networks:
+      - proxy
+    cap_add:
+      - ALL      
+    labels: 
+      - "traefik.http.routers.textgen.rule=Host(`textgen.llama`)"
+    devices:
+      - "/dev/kfd:/dev/kfd"
+      - "/dev/dri/:/dev/dri/"
+    group_add:
+      - video   
+      - render
+      - messagebus # Not sure why this group is wrong on /dev in the container
+    volumes:
+      - ./data/lora:/data/lora
+      - ./data/cache:/data/cache
+      - ./data/prompts:/app/text-generation-webui/prompts
+      - /home/zachd/Storage:/data/model
+networks:
+  proxy: 
+    external: 
+      name: traefik_default
